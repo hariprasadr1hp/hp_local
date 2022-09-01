@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+
+if [ "$(uname -s)" == "Linux" ]; then
+
+	# read the current status
+	night_status=$(dconf read /org/gnome/settings-daemon/plugins/color/night-light-enabled)
+
+	# toggle function
+	[[ $night_status = "true" ]] && toggle="false" || toggle="true"
+
+	# write/update the toggled status
+	echo $toggle | xargs -I {} dconf write /org/gnome/settings-daemon/plugins/color/night-light-enabled {}
+
+elif [ "$(uname -s)" = "Darwin" ]; then
+
+	echo -e "'toggle_night' functionality for 'macos' not implemented yet"
+
+else
+	echo -e "Cannot run 'toggle_night' functionality. Unrecognised machine!"
+fi
+
