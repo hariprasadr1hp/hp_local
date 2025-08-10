@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+enable_night_shift_gnome() {
+    sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist CBUser-0 -dict-add "CBBlueReductionStatus" "{CBBlueReductionEnabled=1;CBBlueReductionStrength=0.5;CBBlueReductionSunScheduleEnabled=0;}"
+    sudo killall cfprefsd
+    sudo killall -HUP corebrightnessd
+    echo "Night Shift enabled."
+}
+
+disable_night_shift_gnome() {
+    sudo defaults write /var/root/Library/Preferences/com.apple.CoreBrightness.plist CBUser-0 -dict-add "CBBlueReductionStatus" "{CBBlueReductionEnabled=0;}"
+    sudo killall cfprefsd
+    sudo killall -HUP corebrightnessd
+    echo "Night Shift disabled."
+}
+
+if [[ "$(uname)" == "Darwin" ]]; then
+    echo "not supported for MacOS at the moment"
+    exit 1
+
+elif [[ "$(uname)" == "Linux" ]]; then
+    toggled_status_linux=$(sudo defaults read /var/root/Library/Preferences/com.apple.CoreBrightness.plist CBUser-0 | grep CBBlueReductionEnabled | awk '{print $3}' | tr -d ';')
+    if [ "$toggled_status_linux" == "1" ]; then
+        disable_night_shift_gnome
+    else
+        enable_night_shift_gnome
+    fi
+else
+    echo "Unsupported OS: ${OS}. Only for Linux and MacOS "
+    exit 1
+fi

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Get default controller (first available)
+controller=$(bluetoothctl list | head -n 1 | cut -d ' ' -f2)
+
+# Exit if no controller found
+[[ -z "$controller" ]] && echo "󰂲 No BT" && exit
+
+# Is Bluetooth powered?
+powered=$(bluetoothctl show "$controller" | grep "Powered:" | awk '{print $2}')
+[[ "$powered" != "yes" ]] && echo "󰂲 Off" && exit
+
+# Check for connected devices
+connected=$(bluetoothctl info | grep -q "Connected: yes" && echo "yes" || echo "no")
+
+if [[ "$connected" == "yes" ]]; then
+    device_name=$(bluetoothctl info | grep "Name:" | cut -d ' ' -f2-)
+    echo "󰂯 $device_name"
+else
+    echo "󰂯 On"
+fi
+
